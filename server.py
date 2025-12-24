@@ -18,14 +18,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Kept exactly as you requested
 mcp = FastMCP("Demo") 
-# Note: FastMCP(app) is technically incorrect usage in most versions 
-# (it expects a name string), but if it was running for you, 
-# you can leave it. I switched to "Demo" to be safe. 
-# If you prefer, change "Demo" back to app.
 
-# [cite_start]Initialize ChromaDB [cite: 50-54]
 client = chromadb.Client()
 collection = client.create_collection(name="customer_memory")
 
@@ -45,7 +39,6 @@ def read_root():
 
 @app.post("/memory/retrieve")
 def retrieve_memory(data: MemoryInput):
-    # [cite_start]Logic from Manual Section 12.2 [cite: 116-117]
     results = collection.query(
         query_texts=[data.user_input],
         n_results=1 
@@ -56,7 +49,6 @@ def retrieve_memory(data: MemoryInput):
 
 @app.post("/memory/store")
 def store_memory(data: MemoryStore):
-    # [cite_start]Logic from Manual Section 12.1 [cite: 110-113]
     collection.add(
         documents=[data.summary],
         metadatas=[{"user_id": data.user_id}],
@@ -72,5 +64,4 @@ def get_order_status(order_id: str):
     return {"status": "Shipped", "delivery": "2 days"} 
 
 if __name__ == "__main__":
-    # We must run 'app', not 'mcp', because we attached the HTTP routes to 'app'
     uvicorn.run(app, port=3333)
